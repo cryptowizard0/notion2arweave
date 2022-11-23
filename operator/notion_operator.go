@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 
-	"github.com/cryptowizard0/notion2arweave/types"
 	"github.com/cryptowizard0/notion2arweave/utils"
 	"github.com/go-resty/resty/v2"
 )
@@ -26,7 +26,7 @@ func CreateNotionOperator(auth string) *NotionOperator {
 	client.SetHeader("Accept", "application/json").
 		SetHeader("Notion-Version", "2022-06-28").
 		SetAuthToken(auth).
-		SetBaseURL(types.Notion_BaseUrl)
+		SetBaseURL(viper.GetString("notion.base_url"))
 
 	return &NotionOperator{
 		authToken: auth,
@@ -59,7 +59,7 @@ func (n *NotionOperator) FetchPage(uuid string) (txId string, err error) {
 	log.Debug(fullContent)
 
 	// 4. upload arweave
-	arOpt, err := CreateArweaveOperator(types.Pk_dev, "USDC")
+	arOpt, err := CreateArweaveOperator(viper.GetString("arweave.pk"), "USDC")
 	if err != nil {
 		log.Error("create arweave operator error:", err.Error())
 		return "", err
