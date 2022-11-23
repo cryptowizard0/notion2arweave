@@ -9,12 +9,19 @@ import (
 )
 
 func init() {
+	// Read configs
 	viper.SetConfigName("config")
 	viper.SetConfigType("toml")
 	viper.AddConfigPath(".")
 	if err := viper.ReadInConfig(); err != nil {
-		log.Fatalf("read config failed: %v", err)
+		panic(fmt.Sprintf("read config failed: %s", err.Error()))
 	}
+
+	// Init log
+	log.SetFormatter(&log.TextFormatter{
+		FullTimestamp: true,
+	})
+	log.SetLevel(log.DebugLevel)
 }
 
 func main() {

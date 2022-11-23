@@ -1,7 +1,7 @@
 package operator
 
 import (
-	arTypes "github.com/everFinance/goar/types"
+	"github.com/cryptowizard0/notion2arweave/utils"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
@@ -9,12 +9,6 @@ import (
 	"github.com/everFinance/arseeding/sdk/schema"
 	"github.com/everFinance/goether"
 )
-
-var BaseTag = []arTypes.Tag{
-	{Name: "Content-Type", Value: "application/json"},
-	{Name: "App-Name", Value: "notion2arweawve"},
-	{Name: "App-Version", Value: "0.1.0"},
-}
 
 type ArweaveOperator struct {
 	ArseedSdk   sdk.SDK
@@ -42,13 +36,7 @@ func CreateArweaveOperator(priKey, payCurrency string) (*ArweaveOperator, error)
 func (a *ArweaveOperator) SavePage(content string) (txId string, err error) {
 	log.Info("save_page")
 
-	tags := []arTypes.Tag{}
-	tags = append(tags, BaseTag...)
-	tags = append(tags, []arTypes.Tag{
-		{Name: "type", Value: "page"},
-		{Name: "sign", Value: "sign a message"},
-		{Name: "content", Value: content},
-	}...)
+	tags := utils.MakeTags("page", "TODO: sign a message", content)
 
 	_, txId, err = a.ArseedSdk.SendDataAndPay([]byte(content), a.PayCurrency, &schema.OptionItem{Tags: tags}, false)
 	if err != nil {
