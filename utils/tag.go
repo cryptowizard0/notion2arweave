@@ -20,3 +20,12 @@ func MakeTags(typ, sign, content string) []arTypes.Tag {
 
 	return tags
 }
+
+func GetTagValue(name string, tags []arTypes.Tag) string {
+	for _, tag := range tags {
+		if tag.Name == name {
+			return tag.Value
+		}
+	}
+	return ""
+}

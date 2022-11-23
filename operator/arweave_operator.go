@@ -11,8 +11,9 @@ import (
 )
 
 type ArweaveOperator struct {
-	ArseedSdk   sdk.SDK
-	PayCurrency string
+	ArseedSdk    *sdk.SDK
+	ArseedClient *sdk.ArSeedCli
+	PayCurrency  string
 }
 
 func CreateArweaveOperator(priKey, payCurrency string) (*ArweaveOperator, error) {
@@ -20,21 +21,23 @@ func CreateArweaveOperator(priKey, payCurrency string) (*ArweaveOperator, error)
 	if err != nil {
 		return nil, err
 	}
-	sdk, err := sdk.NewSDK(viper.GetString("arweave.arseed_url"), viper.GetString("arweave.everpay_url"), eccSigner)
+	arseedSdk, err := sdk.NewSDK(viper.GetString("arweave.arseed_url"), viper.GetString("arweave.everpay_url"), eccSigner)
 	if err != nil {
 		return nil, err
 	}
+	client := sdk.New(viper.GetString("arweave.arseed_url"))
 	return &ArweaveOperator{
-		ArseedSdk:   *sdk,
-		PayCurrency: payCurrency,
+		ArseedSdk:    arseedSdk,
+		PayCurrency:  payCurrency,
+		ArseedClient: client,
 	}, nil
 }
 
 // SavePage upload to arweave using arseeding
-// @Pararm content, page content
+// @Param content, page content
 // @Return txId, return by Arweave
 func (a *ArweaveOperator) SavePage(content string) (txId string, err error) {
-	log.Info("save_page")
+	log.Info("arweave operator: save_page")
 
 	tags := utils.MakeTags("page", "TODO: sign a message", content)
 
@@ -42,6 +45,21 @@ func (a *ArweaveOperator) SavePage(content string) (txId string, err error) {
 	if err != nil {
 		return "", err
 	}
+
+	return
+}
+
+// LoadPage load a page content from arweave using arseeding
+// @Param arTxId, tx id on arweave
+// @Return content, return "" if content tag not found
+func (a *ArweaveOperator) LoadPage(arTxId string) (content string, err error) {
+	log.WithField("txid", arTxId).Info("arweave operator: load_page")
+
+	item, err := a.ArseedClient.GetItemMeta(arTxId)
+	if err != nil {
+		return "", err
+	}
+	content = utils.GetTagValue("content", item.Tags)
 
 	return
 }

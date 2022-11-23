@@ -13,7 +13,7 @@ type INotionOperator interface {
 	// FetchChildBlocks, get subblocks
 	FetchChildBlocks(parentId string) (content string, err error)
 
-	// Upload
+	// Upload content to notion
 	// @Pararm parentId, uuid of parent page
 	// @Return uuid, new uuid
 	// @Return content, json format page content
@@ -32,9 +32,9 @@ type IContentAnalyzer interface {
 type IArweaveOperator interface {
 	// Load
 	// @Return content, json format
-	LoadPage() (content string, err error)
-	LoadDatabase() (content string, err error)
-	LoadImage() (content string, err error)
+	LoadPage(arTxId string) (content string, err error)
+	LoadDatabase(arTxId string) (content string, err error)
+	LoadImage(arTxId string) (content string, err error)
 
 	// Save
 	SavePage(content string) (txId string, err error)

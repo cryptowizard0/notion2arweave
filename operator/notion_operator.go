@@ -36,9 +36,9 @@ func CreateNotionOperator(auth string) *NotionOperator {
 
 // Fetch page from notion, upload to arweave4
 // @Pararm uuid, page uuid
-// @Return string, txId return by Arweave
+// @Return txId, txId return by Arweave
 func (n *NotionOperator) FetchPage(uuid string) (txId string, err error) {
-	log.WithField("uuid", uuid).Info("fetch_page")
+	log.WithField("uuid", uuid).Info("notion operator: fetch page")
 
 	// 1. get page info
 	strPageInfo, err := n.fetchPageInfo(uuid)
@@ -70,6 +70,36 @@ func (n *NotionOperator) FetchPage(uuid string) (txId string, err error) {
 	}
 
 	return
+}
+
+// UploadPage uploading page content get from arweave to notion
+// @Pararm parentId, parent page uuid, where new page to be loaded
+// @Pararm arTxId, txId return by Arweave
+// @Return uuid, uuid of new page
+// @Return content, new page content
+func (n *NotionOperator) UploadPage(parentId, arTxId string) (uuid, content string, err error) {
+	log.WithField("arTxId", arTxId).WithField("parent", parentId).Info("notion operator: upload page")
+
+	// 1. load content from ar
+	arOpt, err := CreateArweaveOperator(viper.GetString("arweave.pk"), "USDC")
+	if err != nil {
+		log.Error("create arweave operator error:", err.Error())
+		return "", "", err
+	}
+	srcContent, err := arOpt.LoadPage(arTxId)
+	if err != nil {
+		log.Error("get content from arweave error: ", err.Error())
+		return "", "", err
+	}
+	if srcContent == "" {
+		log.WithField("arTxId", arTxId).Error("Can't find content within ArTx")
+		return "", "", fmt.Errorf("can't find content within ArTx: %s", arTxId)
+	}
+
+	// 2. convert content
+	// 3. upload ar
+
+	return "", srcContent, nil
 }
 
 func (n *NotionOperator) fetchPageInfo(uuid string) (content string, err error) {
