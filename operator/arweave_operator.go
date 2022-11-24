@@ -16,21 +16,23 @@ type ArweaveOperator struct {
 	PayCurrency  string
 }
 
-func CreateArweaveOperator(priKey, payCurrency string) (*ArweaveOperator, error) {
+func CreateArweaveOperator(priKey, payCurrency string) *ArweaveOperator {
 	eccSigner, err := goether.NewSigner(priKey)
 	if err != nil {
-		return nil, err
+		log.Error("create signer failed! Error:", err.Error())
+		return nil
 	}
 	arseedSdk, err := sdk.NewSDK(viper.GetString("arweave.arseed_url"), viper.GetString("arweave.everpay_url"), eccSigner)
 	if err != nil {
-		return nil, err
+		log.Error("create arseed sdk failed! Error:", err.Error())
+		return nil
 	}
 	client := sdk.New(viper.GetString("arweave.arseed_url"))
 	return &ArweaveOperator{
 		ArseedSdk:    arseedSdk,
 		PayCurrency:  payCurrency,
 		ArseedClient: client,
-	}, nil
+	}
 }
 
 // SavePage upload to arweave using arseeding

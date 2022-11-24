@@ -6,9 +6,9 @@ type INotionOperator interface {
 	// !MUST support recursive
 	// @Pararm uuid,
 	// @Return string, txId return by Arweave
-	FetchPage(uuid string) (txId string, err error)
-	FetchDatabase(uuid string) (txId string, err error)
-	FetchImage(uuid string) (txId string, err error)
+	FetchPage(uuid string) (content string, err error)
+	FetchDatabase(uuid string) (content string, err error)
+	FetchImage(uuid string) (content string, err error)
 	// Level 2 func
 	// FetchChildBlocks, get subblocks
 	FetchChildBlocks(parentId string) (content string, err error)
@@ -17,15 +17,9 @@ type INotionOperator interface {
 	// @Pararm parentId, uuid of parent page
 	// @Return uuid, new uuid
 	// @Return content, json format page content
-	UploadPage(parentId, arTxId string) (uuid, content string, err error)
-	UploadDatabase(parentId, arTxId string) (uuid, content string, err error)
-	UploadImage(arTxid string) (uuid, content string, err error)
-}
-
-// IContentAnalyzer
-type IContentAnalyzer interface {
-	// Saved2Created Converting stored content on Notion to created content, Json format
-	Saved2Created(savedContent string) (createdContent string, err error)
+	UploadPage(parentId, content string) (uuid string, err error)
+	UploadDatabase(parentId, content string) (uuid string, err error)
+	UploadImage(content string) (uuid string, err error)
 }
 
 // IArweaveOperator
@@ -40,4 +34,28 @@ type IArweaveOperator interface {
 	SavePage(content string) (txId string, err error)
 	SaveDatabase(content string) (txId string, err error)
 	SaveImage(content string) (txId string, err error)
+}
+
+// IContentAnalyzer
+type IContentAnalyzer interface {
+	// Covert2UploadContent Converting content from arweave to upload format
+	Covert2UploadContent(savedContent string) (createdContent string, err error)
+}
+
+type IOperator interface {
+	// Save2Ar fetch content from notion and upload to arweave
+	// !MUST support recursive
+	// @Pararm uuid,
+	// @Return string, txId return by Arweave
+	SavePage2Ar(uuid string) (arTxId string, err error)
+	SaveDatabase2Ar(uuid string) (arTxId string, err error)
+	SaveImage2Ar(uuid string) (arTxId string, err error)
+
+	// LoadFromAr get content from arweave and upload to notion
+	// @Pararm parentId, uuid of parent page
+	// @Return uuid, new uuid
+	// @Return content, json format page content
+	LoadPageFromAr(parentId, arTxId string) (uuid string, err error)
+	LoadDatabaseFromAr(parentId, arTxId string) (uuid string, err error)
+	LoadImageFromAr(parentId, arTxId string) (uuid string, err error)
 }

@@ -31,11 +31,16 @@ func main() {
 }
 
 func queryUseOPerator() {
-	opt := operator.CreateNotionOperator(viper.GetString("notion.api_auth"))
-	txId, err := opt.FetchPage("c904d90c9abf4de68f7520786193d4c0")
-	if err != nil {
-		fmt.Println(err.Error())
-	}
+	opt := operator.CreateOperator(
+		viper.GetString("notion.api_auth"),
+		viper.GetString("arweave.pk"),
+		"USDC")
+	if opt != nil {
+		arTxId, err := opt.SavePage2Ar("c904d90c9abf4de68f7520786193d4c0")
+		if err != nil {
+			fmt.Println(err.Error())
+		}
 
-	log.WithField("txId", txId).Info("fetch_page OK!")
+		opt.LoadPageFromAr("", arTxId)
+	}
 }
