@@ -35,11 +35,11 @@ func CreateArweaveOperator(priKey, payCurrency string) *ArweaveOperator {
 	}
 }
 
-// SavePage upload to arweave using arseeding
+// SavePage upload page to arweave using arseeding
 // @Param content, page content
 // @Return txId, return by Arweave
 func (a *ArweaveOperator) SavePage(content string) (txId string, err error) {
-	log.Info("arweave operator: save_page")
+	log.Info("arweave operator: save page to arweave")
 
 	tags := utils.MakeTags("page", "TODO: sign a message", content)
 
@@ -55,7 +55,7 @@ func (a *ArweaveOperator) SavePage(content string) (txId string, err error) {
 // @Param arTxId, tx id on arweave
 // @Return content, return "" if content tag not found
 func (a *ArweaveOperator) LoadPage(arTxId string) (content string, err error) {
-	log.WithField("txid", arTxId).Info("arweave operator: load_page")
+	log.WithField("txid", arTxId).Info("arweave operator: load page from arweave")
 
 	item, err := a.ArseedClient.GetItemMeta(arTxId)
 	if err != nil {

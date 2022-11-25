@@ -1,20 +1,25 @@
 package operator
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 
+	"github.com/dstotijn/go-notion"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
+	"github.com/cryptowizard0/notion2arweave/types"
 	"github.com/cryptowizard0/notion2arweave/utils"
 	"github.com/go-resty/resty/v2"
 )
 
 // NotionOperator inherite INotionOperator
 type NotionOperator struct {
-	authToken string
-	client    *resty.Client
+	authToken    string
+	client       *resty.Client
+	notionClient *notion.Client
 }
 
 // Implementation of Notion interaction
@@ -29,8 +34,9 @@ func CreateNotionOperator(auth string) *NotionOperator {
 		SetBaseURL(viper.GetString("notion.base_url"))
 
 	return &NotionOperator{
-		authToken: auth,
-		client:    client,
+		authToken:    auth,
+		client:       client,
+		notionClient: notion.NewClient(auth),
 	}
 }
 
@@ -66,13 +72,29 @@ func (n *NotionOperator) FetchPage(uuid string) (content string, err error) {
 // @Pararm content, page content ,need convert to upload format
 // @Return uuid, uuid of new page
 // @Return content, new page content
-func (n *NotionOperator) UploadPage(parentId, content string) (uuid string, err error) {
+func (n *NotionOperator) UploadPage(parentId string, page *types.ArweavePage) (uuid string, err error) {
 	log.WithField("parent", parentId).Info("notion operator: upload page")
 
-	// 1. convert content
-	// 2. upload to notion
+	pageProp, ok := page.PageInfo.Properties.(notion.PageProperties)
+	if !ok {
+		return "", fmt.Errorf("Convert page preperites error!")
+	}
 
-	return "", nil
+	children := page.PageContent.Results
+
+	newPageParams := notion.CreatePageParams{
+		ParentType: notion.ParentTypePage,
+		ParentID:   parentId,
+		Title:      pageProp.Title.Title,
+		Children:   children,
+	}
+	log.Debugf("create notion page with param: %#v", newPageParams)
+	newPage, err := n.notionClient.CreatePage(context.Background(), newPageParams)
+	if err != nil {
+		return "", err
+	}
+
+	return newPage.ID, nil
 }
 
 // ========================================================================
@@ -82,7 +104,7 @@ func (n *NotionOperator) fetchPageInfo(uuid string) (content string, err error) 
 	url := fmt.Sprintf("/v1/pages/%s", uuid)
 	resp, err := n.client.R().Get(url)
 	if err != nil {
-		log.Error("get request error:", err.Error())
+		log.Error("get request error: ", err.Error())
 		return "", err
 	}
 	if resp.StatusCode() != http.StatusOK {
@@ -91,6 +113,21 @@ func (n *NotionOperator) fetchPageInfo(uuid string) (content string, err error) 
 	}
 
 	return string(resp.Body()), nil
+}
+
+func (n *NotionOperator) fetchPageInfoByNotionSdk(uuid string) (content string, err error) {
+	page, err := n.notionClient.FindPageByID(context.Background(), uuid)
+	if err != nil {
+		log.Error("get page error: ", err.Error())
+		return "", err
+	}
+
+	jsonPage, err := json.Marshal(page)
+	if err != nil {
+		return "", err
+	}
+
+	return string(jsonPage), nil
 }
 
 // fetchPageContent

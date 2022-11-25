@@ -27,20 +27,30 @@ func init() {
 func main() {
 	fmt.Println("Hello notion 2 arweave!")
 
-	queryUseOPerator()
+	optTest()
 }
 
-func queryUseOPerator() {
+func optTest() {
 	opt := operator.CreateOperator(
 		viper.GetString("notion.api_auth"),
 		viper.GetString("arweave.pk"),
 		"USDC")
-	if opt != nil {
-		arTxId, err := opt.SavePage2Ar("c904d90c9abf4de68f7520786193d4c0")
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-
-		opt.LoadPageFromAr("", arTxId)
+	if opt == nil {
+		fmt.Println("Error, create operator failed!")
+		return
 	}
+
+	arTxId, err := opt.SavePage2Ar("c904d90c9abf4de68f7520786193d4c0")
+	if err != nil {
+		fmt.Println("Error, SavePage2Ar! ", err.Error())
+	}
+	log.Info("Save 2 ar success: ", arTxId)
+
+	uuid, err := opt.LoadPageFromAr("c904d90c9abf4de68f7520786193d4c0", arTxId)
+	if err != nil {
+		fmt.Println("Error, upload failed! ", err.Error())
+		return
+	}
+
+	log.WithField("uuid", uuid).Info("Success!")
 }

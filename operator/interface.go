@@ -39,7 +39,7 @@ type IArweaveOperator interface {
 // IContentAnalyzer
 type IContentAnalyzer interface {
 	// Covert2UploadContent Converting content from arweave to upload format
-	Covert2UploadContent(savedContent string) (createdContent string, err error)
+	CovertPage2UploadContent(srcContent string) (dstContent string, err error)
 }
 
 type IOperator interface {
