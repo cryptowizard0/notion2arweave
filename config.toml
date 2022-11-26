@@ -2,10 +2,11 @@ appname = "notion2arweave"
 version = "0.1.0"
 
 [arweave]
-	pk = "{Your prvi key}"
+	pk = "xxxxxxxxx"
 	everpay_url = "https://api.everpay.io"
 	arseed_url = "https://arseed.web3infra.dev"
 
 [notion]
-	api_auth = "{Your notion api auth}"
+	api_auth = "secret_xxxxx"
 	base_url = "https://api.notion.com"
+	version = "2022-06-28"

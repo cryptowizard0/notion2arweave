@@ -29,7 +29,7 @@ type NotionOperator struct {
 func CreateNotionOperator(auth string) *NotionOperator {
 	client := resty.New()
 	client.SetHeader("Accept", "application/json").
-		SetHeader("Notion-Version", "2022-06-28").
+		SetHeader("Notion-Version", viper.GetString("notion.version")).
 		SetAuthToken(auth).
 		SetBaseURL(viper.GetString("notion.base_url"))
 
@@ -77,7 +77,7 @@ func (n *NotionOperator) UploadPage(parentId string, page *types.ArweavePage) (u
 
 	pageProp, ok := page.PageInfo.Properties.(notion.PageProperties)
 	if !ok {
-		return "", fmt.Errorf("Convert page preperites error!")
+		return "", fmt.Errorf("convert page preperites error")
 	}
 
 	children := page.PageContent.Results
@@ -87,8 +87,10 @@ func (n *NotionOperator) UploadPage(parentId string, page *types.ArweavePage) (u
 		ParentID:   parentId,
 		Title:      pageProp.Title.Title,
 		Children:   children,
+		Icon:       page.PageInfo.Icon,
+		Cover:      page.PageInfo.Cover,
 	}
-	log.Debugf("create notion page with param: %#v", newPageParams)
+
 	newPage, err := n.notionClient.CreatePage(context.Background(), newPageParams)
 	if err != nil {
 		return "", err
