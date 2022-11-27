@@ -68,5 +68,5 @@ func (o *Operator) LoadPageFromAr(parentId, arTxId string) (uuid string, err err
 		log.Error("upload page to notion failed! error:", err.Error())
 	}
 
-	return
+	return uuid, nil
 }

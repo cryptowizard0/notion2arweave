@@ -54,7 +54,7 @@ func (n *NotionOperator) FetchPage(uuid string) (content string, err error) {
 	}
 
 	// 2. get child blocks
-	strPageContent, err := n.fetchPageContent(uuid)
+	strPageContent, err := n.fetchPageContent(uuid, "")
 	if err != nil {
 		log.Error("fetch page info error:", err.Error())
 		return "", err
@@ -62,7 +62,7 @@ func (n *NotionOperator) FetchPage(uuid string) (content string, err error) {
 
 	// 3. make full content
 	content = fmt.Sprintf(`{"page_info":%s,"page_content":%s}`, strPageInfo, strPageContent)
-	log.WithField("page id", uuid).Debug(content)
+	// log.WithField("page id", uuid).Debug(content)
 
 	return
 }
@@ -86,7 +86,7 @@ func (n *NotionOperator) UploadPage(parentId string, page *types.ArweavePage) (u
 		ParentType: notion.ParentTypePage,
 		ParentID:   parentId,
 		Title:      pageProp.Title.Title,
-		Children:   children,
+		Children:   nil,
 		Icon:       page.PageInfo.Icon,
 		Cover:      page.PageInfo.Cover,
 	}
@@ -94,6 +94,19 @@ func (n *NotionOperator) UploadPage(parentId string, page *types.ArweavePage) (u
 	newPage, err := n.notionClient.CreatePage(context.Background(), newPageParams)
 	if err != nil {
 		return "", err
+	}
+
+	// upload content blocks, Max 100 per request
+	for i := 0; (i * 100) < len(children); i++ {
+		starindex := i * 100
+		endindex := i*100 + 100
+		if endindex > len(children) {
+			endindex = len(children)
+		}
+		_, err = n.notionClient.AppendBlockChildren(context.Background(), newPage.ID, children[starindex:endindex])
+		if err != nil {
+			return "", err
+		}
 	}
 
 	return newPage.ID, nil
@@ -133,8 +146,14 @@ func (n *NotionOperator) fetchPageInfoByNotionSdk(uuid string) (content string, 
 }
 
 // fetchPageContent
-func (n *NotionOperator) fetchPageContent(uuid string) (content string, err error) {
-	url := fmt.Sprintf("/v1/blocks/%s/children", uuid)
+func (n *NotionOperator) fetchPageContent(uuid, startCursor string) (content string, err error) {
+	var url string
+	if startCursor == "" {
+		url = fmt.Sprintf("/v1/blocks/%s/children", uuid)
+	} else {
+		url = fmt.Sprintf("/v1/blocks/%s/children?start_cursor=%s", uuid, startCursor)
+	}
+
 	resp, err := n.client.R().Get(url)
 	if err != nil {
 		log.Error("get request error:", err.Error())
@@ -145,5 +164,28 @@ func (n *NotionOperator) fetchPageContent(uuid string) (content string, err erro
 		return "", fmt.Errorf(resp.String())
 	}
 
-	return string(resp.Body()), nil
+	type hasMore struct {
+		HasMore    bool    `json:"has_more"`
+		NextCursor *string `json:"next_cursor"`
+	}
+	var morePage hasMore
+	err = json.Unmarshal(resp.Body(), &morePage)
+	if err != nil {
+		return "", err
+	}
+	fullContent := string(resp.Body())
+
+	if morePage.HasMore {
+		log.WithField("id", morePage.NextCursor).Info("more page")
+		moreContent, err := n.fetchPageContent(uuid, *morePage.NextCursor)
+		if err != nil {
+			return "", err
+		}
+		fullContent, err = utils.MergeChildBlocks(string(resp.Body()), moreContent)
+		if err != nil {
+			return "", err
+		}
+	}
+
+	return fullContent, nil
 }
