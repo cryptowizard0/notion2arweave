@@ -36,7 +36,7 @@ func (o *Operator) SavePage2Ar(uuid string) (arTxId string, err error) {
 	if err != nil {
 		return "", err
 	}
-
+	log.WithField("txid", arTxId).Info("save page to arweave success")
 	return
 }
 
@@ -67,6 +67,7 @@ func (o *Operator) LoadPageFromAr(parentId, arTxId string) (uuid string, err err
 	if err != nil {
 		log.Error("upload page to notion failed! error:", err.Error())
 	}
+	log.WithField("uuid", uuid).Info("upload page to notion success")
 
 	return uuid, nil
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/cryptowizard0/notion2arweave/operator"
+	"github.com/cryptowizard0/notion2arweave/service"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -27,7 +28,9 @@ func init() {
 func main() {
 	fmt.Println("Hello notion 2 arweave!")
 
-	samplePageTest()
+	service.StartServe()
+
+	//samplePageTest()
 }
 
 func samplePageTest() {
@@ -40,7 +43,7 @@ func samplePageTest() {
 		return
 	}
 
-	arTxId, err := opt.SavePage2Ar("8f7937d345e84645b3b8580dc138e7d2")
+	arTxId, err := opt.SavePage2Ar("2316fe9dade64ffbb5aa45b46f069dbf")
 	if err != nil {
 		fmt.Println("Error, SavePage2Ar! ", err.Error())
 	}
