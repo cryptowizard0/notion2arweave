@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/dstotijn/go-notion"
+	"github.com/cryptowizard0/go-notion"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 

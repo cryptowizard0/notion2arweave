@@ -1,6 +1,6 @@
 package types
 
-import "github.com/dstotijn/go-notion"
+import "github.com/cryptowizard0/go-notion"
 
 type ArweavePage struct {
 	PageInfo    notion.Page                  `json:"page_info"`

@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/cryptowizard0/go-notion"
 	"github.com/cryptowizard0/notion2arweave/types"
-	"github.com/dstotijn/go-notion"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )

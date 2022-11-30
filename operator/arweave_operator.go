@@ -3,9 +3,9 @@ package operator
 import (
 	"encoding/json"
 
+	"github.com/cryptowizard0/go-notion"
 	"github.com/cryptowizard0/notion2arweave/types"
 	"github.com/cryptowizard0/notion2arweave/utils"
-	"github.com/dstotijn/go-notion"
 	"github.com/go-resty/resty/v2"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
