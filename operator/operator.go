@@ -66,6 +66,7 @@ func (o *Operator) LoadPageFromAr(parentId, arTxId string) (uuid string, err err
 	uuid, err = o.NotionOpter.UploadPage(parentId, page)
 	if err != nil {
 		log.Error("upload page to notion failed! error:", err.Error())
+		return "", err
 	}
 	log.WithField("uuid", uuid).Info("upload page to notion success")
 

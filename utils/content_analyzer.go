@@ -35,14 +35,21 @@ func Content2ArweavePage(srcContent string) (*types.ArweavePage, error) {
 			*notion.ToggleBlock,
 			*notion.CalloutBlock,
 			*notion.DividerBlock,
+			*notion.VideoBlock,
 			*notion.QuoteBlock:
 			tmpBlocks = append(tmpBlocks, block)
+		case *notion.ImageBlock:
+			newBlock, err := ConvertImageBlock(block)
+			if err != nil {
+				log.Error(err)
+			} else {
+				tmpBlocks = append(tmpBlocks, newBlock)
+			}
 
 		// case notion.ChildPageBlock:
 		// case notion.ChildDatabaseBlock:
 		// case notion.CodeBlock:
 		// case notion.EmbedBlock:
-		// case notion.ImageBlock:
 		// case notion.AudioBlock:
 		// case notion.VideoBlock:
 		// case notion.FileBlock:
@@ -95,4 +102,37 @@ func MergeChildBlocks(content1, content2 string) (merged string, err error) {
 	log.Debug("merged: ", merged)
 
 	return merged, nil
+}
+
+// ConvertImageBlock convert image block to richtext link.
+func ConvertImageBlock(imageInterface notion.Block) (notion.Block, error) {
+	imageBlock, ok := imageInterface.(*notion.ImageBlock)
+	if !ok {
+		return nil, fmt.Errorf("input block is not notion.ImageBlock ")
+	}
+
+	var url string
+	if imageBlock.Type == notion.FileTypeExternal {
+		url = imageBlock.External.URL
+	} else {
+		url = imageBlock.File.URL
+	}
+	textContent := fmt.Sprintf("Image: %s", url)
+	richTextBlock := notion.ParagraphBlock{
+		RichText: []notion.RichText{
+			{
+				Type: notion.RichTextTypeText,
+				Text: &notion.Text{
+					Content: textContent,
+					Link: &notion.Link{
+						URL: url,
+					},
+				},
+				PlainText: textContent,
+				HRef:      &url,
+			},
+		},
+	}
+
+	return &richTextBlock, nil
 }
