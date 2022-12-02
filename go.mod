@@ -11,7 +11,7 @@ require (
 	github.com/spf13/viper v1.14.0
 )
 
-require github.com/cryptowizard0/go-notion v0.9.1
+require github.com/cryptowizard0/go-notion v0.9.5
 
 require (
 	github.com/StackExchange/wmi v0.0.0-20180116203802-5d049714c4a6 // indirect

@@ -15,6 +15,7 @@ import (
 // Content2ArweavePage converting content from arweave to ArweavePage struct
 func Content2ArweavePage(srcContent string) (*types.ArweavePage, error) {
 	var page types.ArweavePage
+
 	err := json.Unmarshal([]byte(srcContent), &page)
 	if err != nil {
 		return nil, err
@@ -23,52 +24,17 @@ func Content2ArweavePage(srcContent string) (*types.ArweavePage, error) {
 	var tmpBlocks []notion.Block
 
 	for _, block := range page.PageContent.Results {
-		switch block.(type) {
-		// supported block types
-		case *notion.ParagraphBlock,
-			*notion.Heading1Block,
-			*notion.Heading2Block,
-			*notion.Heading3Block,
-			*notion.BulletedListItemBlock,
-			*notion.NumberedListItemBlock,
-			*notion.ToDoBlock,
-			*notion.ToggleBlock,
-			*notion.CalloutBlock,
-			*notion.DividerBlock,
-			*notion.VideoBlock,
-			*notion.QuoteBlock:
-			tmpBlocks = append(tmpBlocks, block)
-		case *notion.ImageBlock:
-			newBlock, err := ConvertImageBlock(block)
-			if err != nil {
-				log.Error(err)
-			} else {
-				tmpBlocks = append(tmpBlocks, newBlock)
-			}
-
-		// case notion.ChildPageBlock:
-		// case notion.ChildDatabaseBlock:
-		// case notion.CodeBlock:
-		// case notion.EmbedBlock:
-		// case notion.AudioBlock:
-		// case notion.VideoBlock:
-		// case notion.FileBlock:
-		// case notion.PDFBlock:
-		// case notion.BookmarkBlock:
-		// case notion.EquationBlock:
-		// case notion.TableOfContentsBlock:
-		// case notion.BreadcrumbBlock:
-		// case notion.ColumnListBlock:
-		// case notion.ColumnBlock:
-		// case notion.TableBlock:
-		// case notion.TableRowBlock:
-		// case notion.LinkPreviewBlock:
-		// case notion.LinkToPageBlock:
-		// case notion.SyncedBlock:
-		// case notion.TemplateBlock:
-		default:
-			// do nothing
+		dto, ok := block.(notion.BlockDTO)
+		if !ok {
+			return nil, fmt.Errorf("convert to notion.BlockDTO failed")
 		}
+		if !IsSupported(&dto) {
+			continue
+		}
+		if dto.Image != nil {
+			block = ConvertImageBlock(&dto)
+		}
+		tmpBlocks = append(tmpBlocks, block)
 	}
 	page.PageContent.Results = tmpBlocks
 
@@ -105,11 +71,8 @@ func MergeChildBlocks(content1, content2 string) (merged string, err error) {
 }
 
 // ConvertImageBlock convert image block to richtext link.
-func ConvertImageBlock(imageInterface notion.Block) (notion.Block, error) {
-	imageBlock, ok := imageInterface.(*notion.ImageBlock)
-	if !ok {
-		return nil, fmt.Errorf("input block is not notion.ImageBlock ")
-	}
+func ConvertImageBlock(blockDTO *notion.BlockDTO) notion.Block {
+	imageBlock := blockDTO.Image
 
 	var url string
 	if imageBlock.Type == notion.FileTypeExternal {
@@ -134,5 +97,29 @@ func ConvertImageBlock(imageInterface notion.Block) (notion.Block, error) {
 		},
 	}
 
-	return &richTextBlock, nil
+	blockDTO.Type = notion.BlockTypeParagraph
+	blockDTO.Paragraph = &richTextBlock
+	blockDTO.Image = nil
+
+	return blockDTO
+}
+
+func IsSupported(dto *notion.BlockDTO) bool {
+	if dto.Paragraph != nil ||
+		dto.Heading1 != nil ||
+		dto.Heading2 != nil ||
+		dto.Heading3 != nil ||
+		dto.BulletedListItem != nil ||
+		dto.NumberedListItem != nil ||
+		dto.ToDo != nil ||
+		dto.Toggle != nil ||
+		dto.Callout != nil ||
+		dto.Divider != nil ||
+		dto.Video != nil ||
+		dto.Quote != nil ||
+		dto.Image != nil {
+		return true
+	}
+
+	return false
 }

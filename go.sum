@@ -132,6 +132,14 @@ github.com/creack/pty v1.1.7/go.mod h1:lj5s0c3V2DBrqTV7llrYr5NG6My20zk30Fl46Y7Do
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/cryptowizard0/go-notion v0.9.1 h1:vnjwRy/1Tv52F1VslEHTlXYEMknOmeh+T9Pp3WPxMnY=
 github.com/cryptowizard0/go-notion v0.9.1/go.mod h1:YCH55vXiAOty4/16r2YC9TMvV/ouULZtDR+qnN9PKwU=
+github.com/cryptowizard0/go-notion v0.9.2 h1:hj25jnAQ2buznpF+zPOInx09cBv7gTX4ejA81jVUeQA=
+github.com/cryptowizard0/go-notion v0.9.2/go.mod h1:YCH55vXiAOty4/16r2YC9TMvV/ouULZtDR+qnN9PKwU=
+github.com/cryptowizard0/go-notion v0.9.3 h1:M6bKZuEb7yQDazetj4fLqmBorUg5JuIZeoIub/ycDpE=
+github.com/cryptowizard0/go-notion v0.9.3/go.mod h1:YCH55vXiAOty4/16r2YC9TMvV/ouULZtDR+qnN9PKwU=
+github.com/cryptowizard0/go-notion v0.9.4 h1:rIvhk3F/P4q0zKsb96qvFMjyOlogfps9mygxOv8Yejo=
+github.com/cryptowizard0/go-notion v0.9.4/go.mod h1:YCH55vXiAOty4/16r2YC9TMvV/ouULZtDR+qnN9PKwU=
+github.com/cryptowizard0/go-notion v0.9.5 h1:tJgN0+i1l+TjFpGkPRXkUlkU5VBNWj4K7GsiYORCT1I=
+github.com/cryptowizard0/go-notion v0.9.5/go.mod h1:YCH55vXiAOty4/16r2YC9TMvV/ouULZtDR+qnN9PKwU=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
 github.com/dave/jennifer v1.2.0/go.mod h1:fIb+770HOpJ2fmN9EPPKOqm1vMGhB+TwXKMZhrIygKg=
 github.com/davecgh/go-spew v0.0.0-20171005155431-ecdeabc65495/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

@@ -2,6 +2,7 @@ package operator
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/cryptowizard0/go-notion"
 	"github.com/cryptowizard0/notion2arweave/types"
@@ -55,6 +56,7 @@ func (a *ArweaveOperator) SavePage(content string) (txId string, err error) {
 		return "", err
 	}
 
+	// bContent := []byte(content)
 	tags := utils.MakeTags("page", "TODO: sign a message", string(bContent))
 
 	_, txId, err = a.ArseedSdk.SendDataAndPay(bContent, a.PayCurrency, &schema.OptionItem{Tags: tags}, false)
@@ -91,15 +93,15 @@ func (a *ArweaveOperator) filterChildBlocks(srcContent string) (*types.ArweavePa
 	var tmpBlocks []notion.Block
 
 	for _, block := range page.PageContent.Results {
-		switch block.(type) {
-		// image, upload to ar
-		case *notion.ImageBlock:
-			imageBlock, ok := block.(*notion.ImageBlock)
-			if !ok {
-				log.Error("input block is not notion.ImageBlock")
-				tmpBlocks = append(tmpBlocks, block)
-				continue
-			}
+		dtoblock, ok := block.(notion.BlockDTO)
+		if !ok {
+			log.Errorf("input block is not notion.BlockDTO: %#v", block)
+			return nil, fmt.Errorf("Convert to BlockDTO failed")
+		}
+
+		if dtoblock.Image != nil {
+			imageBlock := dtoblock.Image
+
 			log.Infof("image block: %#v", imageBlock)
 			var url string
 			if imageBlock.Type == notion.FileTypeExternal {
@@ -120,10 +122,8 @@ func (a *ArweaveOperator) filterChildBlocks(srcContent string) (*types.ArweavePa
 				imageBlock.File.URL = "https://arseed.web3infra.dev/" + arTxId
 			}
 
-			tmpBlocks = append(tmpBlocks, imageBlock)
-		default:
-			tmpBlocks = append(tmpBlocks, block)
 		}
+		tmpBlocks = append(tmpBlocks, dtoblock)
 	}
 	page.PageContent.Results = tmpBlocks
 
