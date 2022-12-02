@@ -17,9 +17,8 @@ import (
 )
 
 type ArweaveOperator struct {
-	ArseedSdk    *sdk.SDK
-	ArseedClient *sdk.ArSeedCli
-	PayCurrency  string
+	ArseedSdk   *sdk.SDK
+	PayCurrency string
 }
 
 func CreateArweaveOperator(priKey, payCurrency string) *ArweaveOperator {
@@ -33,11 +32,10 @@ func CreateArweaveOperator(priKey, payCurrency string) *ArweaveOperator {
 		log.Error("create arseed sdk failed! Error:", err.Error())
 		return nil
 	}
-	client := sdk.New(viper.GetString("arweave.arseed_url"))
+
 	return &ArweaveOperator{
-		ArseedSdk:    arseedSdk,
-		PayCurrency:  payCurrency,
-		ArseedClient: client,
+		ArseedSdk:   arseedSdk,
+		PayCurrency: payCurrency,
 	}
 }
 
@@ -73,7 +71,7 @@ func (a *ArweaveOperator) SavePage(content string) (txId string, err error) {
 func (a *ArweaveOperator) LoadPage(arTxId string) (content string, err error) {
 	log.WithField("txid", arTxId).Info("arweave operator: load page from arweave")
 
-	item, err := a.ArseedClient.GetItemMeta(arTxId)
+	item, err := a.ArseedSdk.Cli.GetItemMeta(arTxId)
 	if err != nil {
 		return "", err
 	}
