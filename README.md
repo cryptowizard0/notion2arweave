@@ -4,6 +4,8 @@ Arweave2notion can store the content of notion to arweave and  restore the pages
 ## Compile and run
 
 ```sh
+go 1.18
+
 $ go tidy
 
 $ go build
@@ -17,8 +19,7 @@ appname = "notion2arweave"
 version = "0.1.0"
 
 [arweave]
-    # Your Metamask private key, used to pay for uploading arweave, using everpay
-	pk = "xxxxxxxxx" 
+	pk = "xxxxxxxxx" # Your Metamask private key, used to pay for uploading arweave, using everpay
 	everpay_url = "https://api.everpay.io"
 	arseed_url = "https://arseed.web3infra.dev"
 
