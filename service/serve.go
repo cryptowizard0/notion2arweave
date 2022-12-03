@@ -1,6 +1,11 @@
 package service
 
-import "github.com/gin-gonic/gin"
+import (
+	"fmt"
+
+	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
+)
 
 func StartServe() {
 	router := gin.Default()
@@ -11,5 +16,6 @@ func StartServe() {
 	group.GET("/page/save/:uuid", SavePage2Ar)
 	group.GET("/page/load/:parent/:artxid", LoadPageFromAr)
 
-	router.Run(":2333")
+	port := fmt.Sprintf(":%s", viper.GetString("service.port"))
+	router.Run(port)
 }

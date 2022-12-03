@@ -10,3 +10,6 @@ version = "0.1.0"
 	api_auth = "secret_xxxxx"
 	base_url = "https://api.notion.com"
 	version = "2022-06-28"
+
+[service]
+	port = "2333"

@@ -94,7 +94,7 @@ func (a *ArweaveOperator) filterChildBlocks(srcContent string) (*types.ArweavePa
 		dtoblock, ok := block.(notion.BlockDTO)
 		if !ok {
 			log.Errorf("input block is not notion.BlockDTO: %#v", block)
-			return nil, fmt.Errorf("Convert to BlockDTO failed")
+			return nil, fmt.Errorf("convert to BlockDTO failed, block uuid: %s", block.ID())
 		}
 
 		if dtoblock.Image != nil {
